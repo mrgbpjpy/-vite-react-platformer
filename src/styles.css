@@ -1,0 +1,238 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0e0f14;
+  color: #e8eaf0;
+}
+
+.appShell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.gameRoot {
+  width: 940px;
+  max-width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  background: #11131a;
+  position: relative;
+}
+
+/* Menu */
+.menu {
+  padding: 48px 28px;
+  text-align: center;
+}
+.title {
+  margin: 0 0 10px 0;
+  font-size: 32px;
+}
+.subtitle {
+  margin: 0 0 22px 0;
+  opacity: 0.8;
+}
+.btn {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.hint {
+  margin-top: 16px;
+  opacity: 0.75;
+  font-size: 13px;
+}
+
+/* HUD */
+.hud {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  z-index: 50;
+}
+.hearts {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.heart {
+  width: 26px;
+  height: 26px;
+  image-rendering: pixelated;
+}
+.heartDim {
+  opacity: 0.25;
+}
+.heartFallbackRow {
+  display: flex;
+  gap: 8px;
+}
+.heartFallback {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #ff4d6d;
+}
+.heartFallbackDim {
+  opacity: 0.25;
+}
+
+/* Stage */
+.stageWrap {
+  padding: 12px;
+}
+.stageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px 10px 4px;
+  opacity: 0.9;
+}
+.stageTitle {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+.stageHint {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0b0c10;
+}
+
+/* Parallax */
+.bgStack {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.bgLayer {
+  position: absolute;
+  inset: 0;
+  width: 120%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.95;
+  user-select: none;
+  pointer-events: none;
+}
+.bgFallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #121727 0%, #0b0c10 70%);
+}
+
+/* World */
+.world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+/* Platforms */
+.platform {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+/* Doors */
+.door {
+  position: absolute;
+  border-radius: 10px;
+  border: 2px dashed rgba(255, 215, 0, 0.6);
+  background: rgba(255, 215, 0, 0.1);
+  display: grid;
+  place-items: end center;
+  padding-bottom: 6px;
+}
+.doorLabel {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Player */
+.player {
+  position: absolute;
+}
+.playerSprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  position: absolute;
+  inset: 0;
+}
+.playerFallback {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: rgba(0, 200, 255, 0.35);
+  border: 1px solid rgba(0, 200, 255, 0.45);
+}
+
+/* Debug */
+.debug {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Credits */
+.creditsScreen {
+  padding: 18px;
+}
+.creditsTop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.creditsViewport {
+  margin-top: 12px;
+  height: 420px;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0b0c10;
+  position: relative;
+}
+.creditsRoll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 520px;
+  padding: 0 22px 40px 22px;
+  animation: roll 18s linear infinite;
+}
+.creditsRoll h3 {
+  margin: 22px 0 8px 0;
+}
+@keyframes roll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-920px);
+  }
+}

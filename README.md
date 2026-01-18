@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# Vite React Platformer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small 2D platformer prototype built with **React + TypeScript + Vite**, with a lightweight “engine” (input, physics, collisions, animation) implemented in plain TS and rendered with simple DOM elements.
 
-Currently, two official plugins are available:
+The goal of this project is to practice game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What The App Does
 
-## React Compiler
+- Start menu -> play through multiple stages -> reach credits
+- Basic platformer movement (run, jump, short-hop)
+- AABB platform collisions (ground / ceiling)
+- Simple camera follow
+- Door trigger zones to transition between stages
+- Parallax background layers per stage
+- HUD driven by Redux (example of UI state living alongside game state)
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## Controls
 
-## Expanding the ESLint configuration
+- Move: `A/D` or `Left/Right`
+- Jump: `W` or `Space`
+- Pause/Exit: `Esc` (back to menu)
+- Doors: walk into the door zone
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React 19 + TypeScript
+- Vite (dev server + build)
+- Redux Toolkit (HUD/health example)
+- Custom game loop via `requestAnimationFrame`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Build/preview:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+## Project Layout (High Level)
+
+- `src/game/engine/` - input handling, physics step, AABB helpers, animation helpers
+- `src/game/stageTemplate/PlatformStage.tsx` - shared stage renderer + loop + camera/parallax
+- `src/game/Stage_*.tsx` - level definitions (platforms, doors, spawn, background layers)
+- `src/store.ts`, `src/features/healthSlice.ts` - Redux store + example slice used by HUD
+- `public/` - static assets (sprites/backgrounds)
+
+## Lessons Learned
+
+- Game code feels best when it is **pure and step-based** (ex: `stepPlayer(...)`) and React is used mainly as a renderer.
+- Collision resolution is much easier to reason about when resolving **Y before X** (classic platformer feel).
+- Clamping `dt` is important; switching tabs can produce huge deltas that break physics.
+- Keeping “engine” logic (physics/input) separated from “content” (stage definitions) makes it much easier to iterate.
+- Redux is a good fit for UI/state like HUD, but you still want gameplay stepping to stay lean to avoid rerender thrash.
+
+## What I Want To Do Next
+
+- Replace placeholder geometry with tilemaps (Tiled) and a real level pipeline
+- Add better collision (slopes, one-way platforms, coyote time, jump buffering)
+- Add enemies/collectibles and a simple checkpoint system
+- Improve performance by rendering to `canvas` (or using a lightweight renderer) instead of DOM nodes
+- Add sound, basic FX, and a proper pause/settings screen
+- Add tests for core utilities (AABB + physics invariants) and CI
+
+## Notes
+
+If sprites fail to load, the player shows a simple fallback block so the game remains playable.
+
