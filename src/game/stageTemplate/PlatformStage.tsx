@@ -36,7 +36,8 @@ export default function PlatformStage({
   const input = useMemo(() => createInputState(), []);
   const [, setTick] = useState(0); // tiny rerender trigger
   const rafRef = useRef<number | null>(null);
-  const lastRef = useRef<number>(performance.now());
+  const lastRef = useRef<number>(0);
+
 
   const [player] = useState<PlayerState>(() => ({
     pos: { x: spawn.x, y: spawn.y },
@@ -74,9 +75,13 @@ export default function PlatformStage({
   }, [input, onExitToMenu]);
 
   useEffect(() => {
+    // Initialize timing inside effect to satisfy hook purity rules.
+    lastRef.current = performance.now();
+
     const loop = (now: number) => {
       const last = lastRef.current;
       lastRef.current = now;
+
 
       // dt in seconds; clamp to prevent huge jumps when tab switches
       const dt = Math.min(0.033, (now - last) / 1000);
@@ -104,11 +109,14 @@ export default function PlatformStage({
   const frameIndex = player.animFrame % activeFrames.length;
   const frameSrc = activeFrames[frameIndex];
 
-  // Parallax: each layer moves slower than camera
+  // Parallax: each layer moves slower than player movement.
+  // Using player X (instead of camX) keeps parallax visible even when the camera
+  // doesn't scroll (ex: WORLD.w === VIEW.w).
   const parallaxOffsets = parallaxLayers.map((_, i) => {
-    const speed = 0.15 + i * 0.18; // background to foreground
-    return -camX * speed;
+    const speed = 0.06 + i * 0.12; // layer0 -> layer2
+    return -player.pos.x * speed;
   });
+
 
   return (
     <div className="stageWrap">
@@ -120,6 +128,7 @@ export default function PlatformStage({
       <div className="viewport" style={{ width: VIEW.w, height: VIEW.h }}>
         {/* Parallax background */}
         <div className="bgStack">
+          <div className="bgFallback" />
           {parallaxLayers.map((src, i) => (
             <img
               key={src}
@@ -130,14 +139,14 @@ export default function PlatformStage({
                 transform: `translateX(${parallaxOffsets[i]}px)`,
               }}
               onError={(e) => {
-                // fallback solid background
-                const img = e.currentTarget;
-                img.style.display = "none";
+                // If an image path is wrong or missing, hide that layer.
+                // The fallback gradient stays visible.
+                e.currentTarget.style.display = "none";
               }}
             />
           ))}
-          <div className="bgFallback" />
         </div>
+
 
         {/* World */}
         <div
