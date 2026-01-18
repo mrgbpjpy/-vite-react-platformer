@@ -1,5 +1,7 @@
 # Vite React Platformer
 
+Live Demo: https://vite-react-platformer-mrgbpjpygmailcoms-projects.vercel.app/
+
 A small 2D platformer prototype built with **React + TypeScript + Vite**, with a lightweight “engine” (input, physics, collisions, animation) implemented in plain TS and rendered with simple DOM elements.
 
 The goal of this project is to practice game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI.
