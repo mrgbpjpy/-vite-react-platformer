@@ -17,7 +17,7 @@ type Props = {
   onExitToMenu: () => void;
 };
 
-const WORLD = { w: 900, h: 440 };
+const WORLD = { w: 4000, h: 440 };
 const VIEW = { w: 900, h: 440 };
 
 function rectStyle(r: Rect): React.CSSProperties {
