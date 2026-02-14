@@ -3,24 +3,25 @@
 
 Live demo: https://vite-react-platformer-mrgbpjpygmailcoms-projects.vercel.app/
 
-A small Mario-like 2D platformer prototype built with **React + TypeScript + Vite**. Gameplay is stepped by a lightweight TypeScript "engine" (input, physics, collisions, animation) and rendered with simple, positioned DOM elements (no canvas).
+A small Mario-like 2D platformer prototype built with React + TypeScript + Vite. Gameplay is stepped by a lightweight TypeScript engine (input, physics, collisions, animation) and rendered with positioned DOM elements (no canvas).
 
-The project goal is practicing game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI state.
+The goal is to practice game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI state.
 
 ## Features
 
 - Start menu -> play through multiple stages -> credits
-- Platformer movement (run + jump + short-hop)
+- Run, jump, and short-hop (release jump early)
 - AABB platform collisions (ground/ceiling + basic side resolution)
 - Horizontal camera follow + world bounds clamping
 - Door trigger zones to transition between stages
-- Parallax background layers per stage (stacked images + fallback gradient)
+- Parallax backgrounds per stage (stacked image layers + gradient fallback)
 - HUD driven by Redux (health hearts example)
+- Dev-only debug panel: Pause, TimeScale, Step Frame
 
 ## Controls
 
 - Move: `A/D` or `Left/Right`
-- Jump: `W` or `Space` (also supports `ArrowUp` on keydown)
+- Jump: `W` or `Space` (ArrowUp is partially supported; see notes)
 - Exit to menu: `Esc`
 - Doors: walk into the door zone
 
@@ -50,36 +51,42 @@ Other scripts:
 
 - `npm run lint`
 
-## How It Works
+## Architecture Overview
 
-### App + Screen Routing
+### Entry + App Shell
 
 - `index.html` mounts `#root` and loads `src/main.tsx`.
-- `src/main.tsx` wraps the app in Redux `<Provider store={store} />`.
+- `src/main.tsx` renders `<App />` inside Redux `<Provider store={store} />` (and React StrictMode).
 - `src/App.tsx` renders `src/game/GameRoot.tsx`.
 
-`src/game/GameRoot.tsx` is a small screen router:
+### Screens + Stage Routing
+
+`src/game/GameRoot.tsx` is a tiny screen router:
 
 - `menu` -> `src/game/StartMenu.tsx`
-- `game` -> current stage component + `src/game/HUD.tsx`
+- `game` -> current stage component from `src/game/stages.ts` + `src/game/HUD.tsx`
 - `credits` -> `src/game/Credits.tsx`
 
-### Stages / Content
+Stage transitions come from "doors" (trigger rectangles). `GameRoot` maps door ids to the next stage/screen.
 
-Stages are declared in `src/game/stages.ts` and implemented as thin wrappers around a shared stage template:
+### Stages (Content)
+
+Stages are thin wrappers around a shared template:
 
 - `src/game/Stage_1.tsx`
 - `src/game/Stage_2.tsx`
 - `src/game/Stage_3.tsx`
 
-Each stage passes these props into `src/game/stageTemplate/PlatformStage.tsx`:
+Each stage passes content into `src/game/stageTemplate/PlatformStage.tsx`:
 
 - `parallaxLayers`: image paths under `public/bg/`
-- `platforms`: array of `{ x, y, w, h }` rectangles
-- `doors`: array of trigger rectangles with `id` and optional `label`
+- `platforms`: rectangles `{ x, y, w, h }`
+- `doors`: trigger rectangles `{ id, x, y, w, h, label? }`
 - `spawn`: player start position
 
-Door ids are routed in `src/game/GameRoot.tsx`:
+Registered stages live in `src/game/stages.ts`.
+
+Door ids currently used (see `src/game/GameRoot.tsx`):
 
 - stage1: `toStage2` -> stage2
 - stage2: `toStage3` -> stage3
@@ -87,14 +94,19 @@ Door ids are routed in `src/game/GameRoot.tsx`:
 
 ### Game Loop + Rendering (PlatformStage)
 
-`src/game/stageTemplate/PlatformStage.tsx` owns most of the runtime:
+`src/game/stageTemplate/PlatformStage.tsx` owns most runtime behavior:
 
-- Input is a mutable object created once (`createInputState`) and updated by DOM key events (`bindKeyboard`).
-- Player is a single mutable object (stored via `useState(() => initialPlayer)`), mutated each frame.
-- A `requestAnimationFrame` loop steps physics + animation, clamps `dt`, and forces a tiny rerender.
-- Camera: horizontal follow based on player X, clamped to `WORLD`.
-- Background: parallax `<img>` layers with a gradient fallback if an image fails.
-- Player rendering: frame-by-frame sprites from `public/sprites/player/`; falls back to a blue rectangle if sprites fail.
+- Input is a mutable object created once (`createInputState`) and mutated by keyboard event listeners (`bindKeyboard`).
+- Player is a single mutable object (created once) and mutated each frame.
+- A `requestAnimationFrame` loop:
+  - clamps `dt` to avoid tab-switch delta spikes
+  - supports dev-time pause / timeScale / single-frame stepping via `EngineConfig` (see `src/game/engine/config.ts`)
+  - calls `stepPlayer(...)` (physics + collisions + door triggers)
+  - calls `updatePlayerAnimation(...)`
+  - triggers a tiny rerender so styles update
+- Camera: horizontal follow, clamped to world bounds.
+- Background: stacked parallax images; each layer hides itself on load error and a gradient fallback stays visible.
+- Player sprites: frame-by-frame PNGs; falls back to a blue rectangle if sprites fail.
 
 ## Engine Modules
 
@@ -102,35 +114,41 @@ Located in `src/game/engine/`:
 
 - `types.ts` - shared types (`Rect`, `PlayerState`, etc.)
 - `input.ts` - keyboard binding + edge-trigger jump (`jumpPressed`)
-- `aabb.ts` - AABB intersection
+- `aabb.ts` - AABB intersection helper
 - `physics.ts` - `stepPlayer(...)` integration + collisions + door triggers
 - `animation.ts` - sprite frame lists + animation timing/state
 
 ## UI State (Redux)
 
-Redux is currently used for UI demonstration (HUD), not gameplay logic:
+Redux is used for UI demonstration (HUD), not gameplay state:
 
-- `src/store.ts` configures the store
-- `src/features/healthSlice.ts` defines health reducers (`damage`, `heal`, etc.)
-- `src/game/HUD.tsx` reads `health.current/max` and renders hearts
+- `src/store.ts` - store configuration
+- `src/features/healthSlice.ts` - health reducers (`damage`, `heal`, `resetHealth`, `setMaxHealth`)
+- `src/game/HUD.tsx` - reads `health.current/max` and renders heart icons
+
+No gameplay code currently dispatches health actions.
 
 ## Assets
 
-Static assets are served from `public/` and referenced via absolute paths:
+Assets are served from `public/` and referenced via absolute paths (example: `/sprites/player/run_right_0.png`).
 
-- `public/bg/` - stage parallax layers
-- `public/sprites/player/` - player sprites (idle/run/jump; left/right)
+- `public/bg/` - parallax layers
+- `public/sprites/player/` - player sprite frames (idle/run/jump; left/right)
 - `public/ui/Heart.png` - HUD hearts
 
 ## Styling
 
-The app imports `src/styles.css` from `src/main.tsx`. (Note: `src/index.css` and `src/App.css` exist but are not currently imported.)
+The app imports `src/styles.css` from `src/main.tsx`.
+
+`src/index.css` and `src/App.css` exist but are not currently imported (likely leftovers from the default Vite template).
 
 ## Notes / Known Quirks
 
 - If sprites fail to load, the player shows a fallback rectangle so the game remains playable.
-- Jump supports `ArrowUp` on keydown, but keyup does not clear the jump flag for `ArrowUp` (see `src/game/engine/input.ts`).
+- `ArrowUp` is handled on keydown for jump, but keyup does not clear jump for ArrowUp (see `src/game/engine/input.ts`).
 - Falling off the world resets the player to `(40, 40)` (not the current stage spawn) (see `src/game/engine/physics.ts`).
+- Stage 1 door placement: the `toStage2` door is at x=2600, while the last ground segment ends at x=2500, so it may be unreachable without additional platforms/ground (see `src/game/Stage_1.tsx`).
+- Debug UI (Pause / TimeScale / Step Frame) is only rendered in dev (`import.meta.env.DEV`) via `src/game/tools/EngineDebugPanel.tsx`.
 - `public/index.html` looks like an older CRA template; Vite uses the root `index.html`.
 - `.vercel/` and `.env*.local` are intentionally ignored by git (see `.gitignore`).
 
@@ -138,10 +156,14 @@ The app imports `src/styles.css` from `src/main.tsx`. (Note: `src/index.css` and
 
 - `src/game/engine/` - input, physics, collisions, animation
 - `src/game/stageTemplate/PlatformStage.tsx` - shared renderer + loop + camera/parallax
-- `src/game/Stage_*.tsx` - stage definitions (platforms, doors, spawn, backgrounds)
+- `src/game/Stage_*.tsx` - stage content (platforms, doors, spawn, backgrounds)
 - `src/game/GameRoot.tsx` - screen + stage routing
 - `src/store.ts`, `src/features/healthSlice.ts` - Redux store + example slice
 - `public/` - static assets (sprites/backgrounds/ui)
+
+## Repo Report
+
+For a codebase-level scan (key files + gotchas), see `report.md`.
 
 ## Next Ideas
 
