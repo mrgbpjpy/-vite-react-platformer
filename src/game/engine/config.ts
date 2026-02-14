@@ -4,5 +4,5 @@ export const EngineConfig = {
     gravity: 1800,
     timeScale: 1,
     paused: false,
-    stepOnce: false,
+    stepOnce: true,
 };

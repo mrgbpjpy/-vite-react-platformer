@@ -6,6 +6,9 @@ import {
   updatePlayerAnimation,
 } from "../engine/animation";
 import type { Door, Platform, PlayerState, Rect } from "../engine/types";
+import { EngineConfig } from "../engine/config";
+import { EngineDebugPanel } from "../tools/EngineDebugPanel";
+
 
 type Props = {
   stageId: string;
@@ -79,18 +82,28 @@ export default function PlatformStage({
     lastRef.current = performance.now();
 
     const loop = (now: number) => {
+      if(EngineConfig.paused && !EngineConfig.stepOnce){
+        lastRef.current = now;
+        rafRef.current = requestAnimationFrame(loop);
+        return;
+      }
+
       const last = lastRef.current;
       lastRef.current = now;
 
 
       // dt in seconds; clamp to prevent huge jumps when tab switches
-      const dt = Math.min(0.033, (now - last) / 1000);
+      const rawDt = Math.min(0.033, (now- last) /1000);
+      const dt = rawDt * EngineConfig.timeScale;
 
       // physics step
       stepPlayer(player, input, platforms, doors, dt, WORLD, onDoor);
 
       // animation step
       updatePlayerAnimation(player, dt);
+
+      //consume single-step
+      EngineConfig.stepOnce = false;
 
       // trigger rerender
       setTick((t) => (t + 1) % 1000000);
@@ -120,6 +133,7 @@ export default function PlatformStage({
 
   return (
     <div className="stageWrap">
+      {import.meta.env.DEV && <EngineDebugPanel/>}
       <div className="stageHeader">
         <div className="stageTitle">{stageId.toUpperCase()}</div>
         <div className="stageHint">Esc to Menu</div>
