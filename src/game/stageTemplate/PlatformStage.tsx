@@ -10,6 +10,9 @@ import { EngineConfig } from "../engine/config";
 import { EngineDebugPanel } from "../tools/EngineDebugPanel";
 import { ReplayController } from "../engine/replay";
 import { ReplayPanel } from "../tools/ReplayPanel";
+import { EntityInspector } from "../tools/EntityInspector";
+import { AABBOverlay } from "../tools/AABBOverlay";
+
 
 type Props = {
   stageId: string;
@@ -42,6 +45,10 @@ export default function PlatformStage({
 
   const showReplay =
     import.meta.env.DEV || import.meta.env.VITE_SHOW_REPLAY === "true";
+
+  const showInspector =
+    import.meta.env.DEV || import.meta.env.VITE_SHOW_INSPECTOR === "true";
+
 
   const input = useMemo(() => createInputState(), []);
   const [, setTick] = useState(0); // tiny rerender trigger
@@ -154,6 +161,9 @@ export default function PlatformStage({
       <div className="stageWrap">
         {showDebug && <EngineDebugPanel />}
         {showReplay && <ReplayPanel />}
+        {showInspector && (
+          <EntityInspector player={player} platforms={platforms} />
+        )}
         <div className="stageHeader">
           <div className="stageTitle">{stageId.toUpperCase()}</div>
           <div className="stageHint">Esc to Menu</div>
@@ -202,6 +212,10 @@ export default function PlatformStage({
               <div className="doorLabel">{d.label ?? d.id}</div>
             </div>
           ))}
+
+          {showInspector && (
+            <AABBOverlay player={player} platforms={platforms} />
+          )}
 
           {/* Player */}
           <div

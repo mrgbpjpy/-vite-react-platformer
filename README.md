@@ -7,6 +7,9 @@ A small Mario-like 2D platformer prototype built with React + TypeScript + Vite.
 
 The goal is to practice game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI state.
 
+This project also serves as a reference sandbox for building and evaluating internal
+game developer tools such as debuggers, inspectors, and deterministic replay systems.
+
 ## Features
 
 - Start menu -> play through multiple stages -> credits
@@ -18,6 +21,40 @@ The goal is to practice game-loop fundamentals in a web app: frame stepping, pla
 - HUD driven by Redux (health hearts example)
 - Debug panel (Pause, TimeScale, Step Frame). Shown in dev, or in prod when `VITE_SHOW_DEBUG=true` (build-time env var).
 - Replay tool (Record / Stop / Replay). Shown in dev, or in prod when `VITE_SHOW_REPLAY=true` (build-time env var).
+- Entity inspector + collision overlay. Shown in dev, or in prod when `VITE_SHOW_INSPECTOR=true` (build-time env var).
+
+## Developer Tooling Rationale
+
+This project intentionally includes internal developer tools alongside gameplay
+to mirror real-world game development workflows.
+
+### Deterministic Replay
+
+Rather than relying solely on logs, the engine supports deterministic input
+recording and replay. Many gameplay bugs are input- and timing-dependent; replay
+turns non-reproducible issues into reproducible scenarios that can be inspected
+frame-by-frame.
+
+### Non-Invasive Tooling
+
+All tools are implemented at engine boundaries (input, simulation step, runtime
+config) and do not modify gameplay logic. Tooling can be enabled or disabled
+without affecting physics, collisions, or player behavior, preserving trust in
+the simulation.
+
+### Runtime Control & Observability
+
+A dev-only debug panel allows pausing, time scaling, and single-frame stepping,
+while an entity inspector visualizes live state (position, velocity, collision
+bounds). Together, these tools make engine behavior observable and debuggable
+without adding gameplay-side complexity.
+
+### Scalability Considerations
+
+The tooling layer is designed to be portable across multiple games by sharing
+stable contracts and opt-in configuration. With additional time, replay artifacts
+would be versioned and persisted per build, enabling regression analysis and
+cross-title debugging at scale.
 
 ## Controls
 
@@ -151,6 +188,7 @@ The app imports `src/styles.css` from `src/main.tsx`.
 - Stage 1 door placement: the `toStage2` door is at x=2600, while the last ground segment ends at x=2500, so it may be unreachable without additional platforms/ground (see `src/game/Stage_1.tsx`).
 - Debug UI (Pause / TimeScale / Step Frame) renders in dev by default. To enable it in a production build, set `VITE_SHOW_DEBUG=true` at build time (Vercel Environment Variables) and redeploy.
 - Replay tool (Record / Stop / Replay) renders in dev by default. To enable it in a production build, set `VITE_SHOW_REPLAY=true` at build time (Vercel Environment Variables) and redeploy.
+- Inspector tools (Entity Inspector + AABB overlay) render in dev by default. To enable them in a production build, set `VITE_SHOW_INSPECTOR=true` at build time (Vercel Environment Variables) and redeploy.
 - `public/index.html` looks like an older CRA template; Vite uses the root `index.html`.
 - `.vercel/` and `.env*.local` are intentionally ignored by git (see `.gitignore`).
 
@@ -167,7 +205,7 @@ The app imports `src/styles.css` from `src/main.tsx`.
 
 For a codebase-level scan (key files + gotchas), see `report.md`.
 
-## Next Ideas
+## Potential Extensions
 
 - Replace placeholder rectangles with tilemaps (Tiled) + a level pipeline
 - Improve movement feel (coyote time, jump buffering, one-way platforms, slopes)
