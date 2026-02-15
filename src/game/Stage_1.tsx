@@ -9,8 +9,7 @@ export default function Stage1(props: {
       stageId="stage1"
       parallaxLayers={[
         "/bg/stage1_layer0.png",
-        "/bg/stage1_layer1.png",
-        "/bg/stage1_layer2.jpg",
+        "/bg/stage1_layer1.jpg",
       ]}
       platforms={[
         // ground
