@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,3 +30,8 @@ dist-ssr
 
 .vercel
 .env*.local
+
+# Tooling caches
+*.tsbuildinfo
+.eslintcache
+coverage
