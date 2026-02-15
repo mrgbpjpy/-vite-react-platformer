@@ -15,7 +15,6 @@ game developer tools such as debuggers, inspectors, and deterministic replay sys
 
 ![Developer Tools Overview](./docs/dev-tools-overview.gif)
 
-
 ## Features
 
 - Start menu -> play through multiple stages -> credits
