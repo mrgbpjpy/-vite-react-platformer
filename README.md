@@ -13,7 +13,7 @@ game developer tools such as debuggers, inspectors, and deterministic replay sys
 This project also serves as a reference sandbox for building and evaluating internal
 game developer tools such as debuggers, inspectors, and deterministic replay systems.
 
-![Developer Tools Overview](./docs/dev-tools-overview.gif)
+![Developer Tools Overview](docs/dev-tools-overview.gif)
 
 ## Features
 
