@@ -8,7 +8,8 @@ import {
 import type { Door, Platform, PlayerState, Rect } from "../engine/types";
 import { EngineConfig } from "../engine/config";
 import { EngineDebugPanel } from "../tools/EngineDebugPanel";
-
+import { ReplayController } from "../engine/replay";
+import { ReplayPanel } from "../tools/ReplayPanel";
 
 type Props = {
   stageId: string;
@@ -36,6 +37,12 @@ export default function PlatformStage({
   onDoor,
   onExitToMenu,
 }: Props) {
+  const showDebug =
+    import.meta.env.DEV || import.meta.env.VITE_SHOW_DEBUG === "true";
+
+  const showReplay =
+    import.meta.env.DEV || import.meta.env.VITE_SHOW_REPLAY === "true";
+
   const input = useMemo(() => createInputState(), []);
   const [, setTick] = useState(0); // tiny rerender trigger
   const rafRef = useRef<number | null>(null);
@@ -97,7 +104,19 @@ export default function PlatformStage({
       const dt = rawDt * EngineConfig.timeScale;
 
       // physics step
-      stepPlayer(player, input, platforms, doors, dt, WORLD, onDoor);
+      let frameInput = input;
+
+      if(ReplayController.mode === "replaying"){
+        const replayed = ReplayController.nextInput();
+        if (replayed) frameInput = replayed;
+        // Prevent edge-trigger inputs from accumulating while we ignore live input.
+        input.jumpPressed = false;
+      } else if (ReplayController.mode === "recording") {
+        // Capture input BEFORE physics consumes edge triggers (jumpPressed).
+        ReplayController.record(input);
+      }
+
+      stepPlayer(player, frameInput, platforms, doors, dt, WORLD, onDoor);
 
       // animation step
       updatePlayerAnimation(player, dt);
@@ -132,12 +151,13 @@ export default function PlatformStage({
 
 
   return (
-    <div className="stageWrap">
-      {import.meta.env.DEV && <EngineDebugPanel/>}
-      <div className="stageHeader">
-        <div className="stageTitle">{stageId.toUpperCase()}</div>
-        <div className="stageHint">Esc to Menu</div>
-      </div>
+      <div className="stageWrap">
+        {showDebug && <EngineDebugPanel />}
+        {showReplay && <ReplayPanel />}
+        <div className="stageHeader">
+          <div className="stageTitle">{stageId.toUpperCase()}</div>
+          <div className="stageHint">Esc to Menu</div>
+        </div>
 
       <div className="viewport" style={{ width: VIEW.w, height: VIEW.h }}>
         {/* Parallax background */}

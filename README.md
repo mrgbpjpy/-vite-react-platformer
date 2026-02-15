@@ -16,7 +16,8 @@ The goal is to practice game-loop fundamentals in a web app: frame stepping, pla
 - Door trigger zones to transition between stages
 - Parallax backgrounds per stage (stacked image layers + gradient fallback)
 - HUD driven by Redux (health hearts example)
-- Dev-only debug panel: Pause, TimeScale, Step Frame
+- Debug panel (Pause, TimeScale, Step Frame). Shown in dev, or in prod when `VITE_SHOW_DEBUG=true` (build-time env var).
+- Replay tool (Record / Stop / Replay). Shown in dev, or in prod when `VITE_SHOW_REPLAY=true` (build-time env var).
 
 ## Controls
 
@@ -148,7 +149,8 @@ The app imports `src/styles.css` from `src/main.tsx`.
 - `ArrowUp` is handled on keydown for jump, but keyup does not clear jump for ArrowUp (see `src/game/engine/input.ts`).
 - Falling off the world resets the player to `(40, 40)` (not the current stage spawn) (see `src/game/engine/physics.ts`).
 - Stage 1 door placement: the `toStage2` door is at x=2600, while the last ground segment ends at x=2500, so it may be unreachable without additional platforms/ground (see `src/game/Stage_1.tsx`).
-- Debug UI (Pause / TimeScale / Step Frame) is only rendered in dev (`import.meta.env.DEV`) via `src/game/tools/EngineDebugPanel.tsx`.
+- Debug UI (Pause / TimeScale / Step Frame) renders in dev by default. To enable it in a production build, set `VITE_SHOW_DEBUG=true` at build time (Vercel Environment Variables) and redeploy.
+- Replay tool (Record / Stop / Replay) renders in dev by default. To enable it in a production build, set `VITE_SHOW_REPLAY=true` at build time (Vercel Environment Variables) and redeploy.
 - `public/index.html` looks like an older CRA template; Vite uses the root `index.html`.
 - `.vercel/` and `.env*.local` are intentionally ignored by git (see `.gitignore`).
 
