@@ -14,7 +14,7 @@ This project also serves as a reference sandbox for designing and evaluating
 **internal game developer tools**—such as debuggers, inspectors, and deterministic
 replay systems—similar to those used in real-world game production workflows.
 
-![Developer Tools Overview](./docs/dev-tools-overview.gif)
+![Developer Tools Overview](docs/dev-tools-overview-small.gif)
 
 ## Features
 
