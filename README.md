@@ -10,6 +10,12 @@ The goal is to practice game-loop fundamentals in a web app: frame stepping, pla
 This project also serves as a reference sandbox for building and evaluating internal
 game developer tools such as debuggers, inspectors, and deterministic replay systems.
 
+This project also serves as a reference sandbox for building and evaluating internal
+game developer tools such as debuggers, inspectors, and deterministic replay systems.
+
+![Developer Tools Overview](./docs/dev-tools-overview.gif)
+
+
 ## Features
 
 - Start menu -> play through multiple stages -> credits
