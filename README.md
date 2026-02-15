@@ -1,19 +1,20 @@
-
 # Vite React Platformer
 
 Live demo: https://vite-react-platformer-mrgbpjpygmailcoms-projects.vercel.app/
 
-A small Mario-like 2D platformer prototype built with React + TypeScript + Vite. Gameplay is stepped by a lightweight TypeScript engine (input, physics, collisions, animation) and rendered with positioned DOM elements (no canvas).
+A small Mario-like 2D platformer prototype built with React, TypeScript, and Vite.
+Gameplay is stepped by a lightweight TypeScript engine (input, physics, collisions,
+animation) and rendered with positioned DOM elements (no canvas).
 
-The goal is to practice game-loop fundamentals in a web app: frame stepping, platform collisions, stage routing, and keeping gameplay code separated from UI state.
+The primary goal is to practice core game-loop fundamentals in a web environment:
+frame stepping, platform collisions, stage routing, and keeping gameplay logic
+cleanly separated from UI state.
 
-This project also serves as a reference sandbox for building and evaluating internal
-game developer tools such as debuggers, inspectors, and deterministic replay systems.
+This project also serves as a reference sandbox for designing and evaluating
+**internal game developer tools**—such as debuggers, inspectors, and deterministic
+replay systems—similar to those used in real-world game production workflows.
 
-This project also serves as a reference sandbox for building and evaluating internal
-game developer tools such as debuggers, inspectors, and deterministic replay systems.
-
-![Developer Tools Overview](docs/dev-tools-overview.gif)
+![Developer Tools Overview](./docs/dev-tools-overview.gif)
 
 ## Features
 
