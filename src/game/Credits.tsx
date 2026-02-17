@@ -31,8 +31,8 @@ export default function Credits({ onBackToMenu }: Props) {
         <div ref={wrapRef} className="creditsRoll">
           <h3>Developer</h3>
           <p>Erick Esquilin</p>
-
-          <h3>Game Development</h3>
+          <p>Contact: <a href="mailto:mrgbpjpy@gmail.com">MrGbpJpy@gmail.com</a></p>
+          <h3>Game Tools Developer</h3>
           <p>React + Redux Toolkit</p>
           <p>AABB collisions • Parallax • Animation loops</p>
 
